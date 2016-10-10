@@ -47,7 +47,8 @@ class LikeStuffApp extends Component {
             this.camera = cam;
           }}
           style={styles.preview}
-          aspect={Camera.constants.Aspect.fill}>
+          aspect={Camera.constants.Aspect.fill}
+          captureAudio={false}>
           <Text>
           <Text style={styles.title}>Initial position: </Text>
           {this.state.initialPosition}
