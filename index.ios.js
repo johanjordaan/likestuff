@@ -10,6 +10,7 @@ import {
    Image,
 } from 'react-native';
 import Camera from 'react-native-camera';
+var RNFS = require('react-native-fs');
 
 const CAMERA = 'camera';
 const AFTER = 'after';
@@ -38,11 +39,43 @@ class LikeStuffApp extends Component {
          var lastPosition = JSON.stringify(position);
          this.setState({lastPosition:lastPosition});
       });
+
    }
 
    componentWillUnmount() {
       navigator.geolocation.clearWatch(this.watchID);
    }
+
+   testFS () {
+      console.log()
+      var docs = "/Users/johan/Library/Developer/CoreSimulator/Devices/D949B309-EC70-46CF-83F7-B63792620462/data/Containers/Data/Application/81D3F65A-57CF-4DD6-9472-0C6188D9D197/Documents/"
+      var  main = RNFS.MainBundlePath;
+      console.log(docs);
+      console.log(main);
+   RNFS.readDir(docs)
+     .then((result) => {
+      console.log('GOT RESULT', result);
+
+      // stat the first file
+      return Promise.all([RNFS.stat(result[0].path), result[0].path]);
+     })
+     .then((statResult) => {
+      if (statResult[0].isFile()) {
+         // if we have a file, read it
+         return RNFS.readFile(statResult[1], 'utf8');
+      }
+
+      return 'no file';
+     })
+     .then((contents) => {
+      // log the file contents
+      console.log(contents);
+     })
+     .catch((err) => {
+      console.log(err.message, err.code);
+     });
+  }
+
 
    renderCamera() {
       return (
@@ -88,12 +121,14 @@ class LikeStuffApp extends Component {
    lovePicture() {
       var location = ""; //TODO : get location
       this.handlePicture("love",location).then(()=>{
+         this.testFS();
       });
    }
 
    hatePicture() {
       var location = ""; //TODO : get location
       this.handlePicture("hate",location).then(()=>{
+         this.testFS();
       });
    }
 
