@@ -6,7 +6,8 @@ import {
    StyleSheet,
    Text,
    TouchableHighlight,
-   View
+   View,
+   Image,
 } from 'react-native';
 import Camera from 'react-native-camera';
 
@@ -17,6 +18,8 @@ class LikeStuffApp extends Component {
    constructor () {
 	   super();
       this.watchID = null;
+      this.lovePicture = this.lovePicture.bind(this);
+      this.hatePicture = this.hatePicture.bind(this);
 		this.state = {
          currentScreen: CAMERA,
          lastPosition: 'unknown',
@@ -48,13 +51,14 @@ class LikeStuffApp extends Component {
             ref="camera"
             style={styles.preview}
             aspect={Camera.constants.Aspect.fill}
+            captureTarget={Camera.constants.CaptureTarget.disk}
             captureAudio={false}>
             <Text>
-            <Text style={styles.title}>Initial position: </Text>
-            {this.state.initialPosition}
-         </Text>
-            <Text style={styles.capture} onPress={this.lovePicture.bind(this)}>[Love]</Text>
-            <Text style={styles.capture} onPress={this.hatePicture.bind(this)}>[Hate]</Text>
+               <Text style={styles.title}>Initial position: </Text>
+               {this.state.initialPosition}
+            </Text>
+            <Text style={styles.capture} onPress={this.lovePicture}>[Love]</Text>
+            <Text style={styles.capture} onPress={this.hatePicture}>[Hate]</Text>
          </Camera>
         </View>
       );
@@ -63,11 +67,13 @@ class LikeStuffApp extends Component {
       return (
          <View style={styles.container}>
             <Text style={styles.capture} onPress={this.doAfter.bind(this)}>[Back]</Text>
+            <Image style={styles.preview} source={{uri: this.state.photo.path}}/>
          </View>
       );
    }
 
    render() {
+      console.log("Here ...",this.state.currentScreen)
       if(this.state.currentScreen === CAMERA) {
          return this.renderCamera();
       } else {
@@ -77,7 +83,6 @@ class LikeStuffApp extends Component {
 
    doAfter() {
       this.setState({currentScreen:CAMERA});
-
    }
 
    lovePicture() {
@@ -94,7 +99,8 @@ class LikeStuffApp extends Component {
 
    handlePicture(caption,location) {
       return this.refs.camera.capture().then((data)=>{
-         this.setState({currentScreen:AFTER})
+         this.setState({currentScreen:AFTER,photo:data})
+         console.log(data);
          // Send caption - with picture to server
          // Remove from your camera roll?
             // Send the picture to the server for processing
