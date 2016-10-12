@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import Camera from 'react-native-camera';
 var RNFS = require('react-native-fs');
+var CryptoJS = require('crypto-js');
+var config = require('./config');
 
 const CAMERA = 'camera';
 const AFTER = 'after';
@@ -47,12 +49,7 @@ class LikeStuffApp extends Component {
    }
 
    testFS () {
-      console.log()
-      var docs = "/Users/johan/Library/Developer/CoreSimulator/Devices/D949B309-EC70-46CF-83F7-B63792620462/data/Containers/Data/Application/81D3F65A-57CF-4DD6-9472-0C6188D9D197/Documents/"
-      var  main = RNFS.MainBundlePath;
-      console.log(docs);
-      console.log(main);
-   RNFS.readDir(docs)
+   RNFS.readDir(RNFS.DocumentDirectoryPath)
      .then((result) => {
       console.log('GOT RESULT', result);
 
@@ -132,10 +129,46 @@ class LikeStuffApp extends Component {
       });
    }
 
+
+
+   uploadImage(uri,tags) {
+     let timestamp = (Date.now() / 1000 | 0).toString();
+     let api_key = config.KEY
+     let api_secret = config.SECRET
+     let cloud = config.CLOUD
+     let hash_string = 'tags='+tags+'&timestamp=' + timestamp + api_secret;
+     let signature = CryptoJS.SHA1(hash_string).toString();
+     let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/image/upload'
+
+     let xhr = new XMLHttpRequest();
+     xhr.open('POST', upload_url);
+     xhr.onload = () => {
+     };
+     xhr.onreadystatechange = (e) => {
+       if (xhr.readyState !== 4) {
+         return;
+       }
+
+       if (xhr.status === 200) {
+         console.log('success', xhr.responseText);
+       } else {
+         console.warn('error',xhr.responseText,"--");
+       }
+     };
+     let formdata = new FormData();
+     formdata.append('file', {uri: uri, type: 'image/png', name: 'upload.png'});
+     formdata.append('timestamp', timestamp);
+     formdata.append('api_key', api_key);
+     formdata.append('signature', signature);
+     formdata.append('tags', tags);
+     xhr.send(formdata);
+   }
+
    handlePicture(caption,location) {
       return this.refs.camera.capture().then((data)=>{
          this.setState({currentScreen:AFTER,photo:data})
          console.log(data);
+         this.uploadImage(data.path,caption)
          // Send caption - with picture to server
          // Remove from your camera roll?
             // Send the picture to the server for processing
