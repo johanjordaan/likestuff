@@ -12,6 +12,7 @@ import {
 import Camera from 'react-native-camera';
 var RNFS = require('react-native-fs');
 var CryptoJS = require('crypto-js');
+var config = require('./config');
 
 const CAMERA = 'camera';
 const AFTER = 'after';
@@ -128,45 +129,9 @@ class LikeStuffApp extends Component {
       });
    }
 
-
-
-   uploadImagex(uri,tags) {
-     let timestamp = (Date.now() / 1000 | 0).toString();
-     let api_key = config.KEY
-     let api_secret = config.SECRET
-     let cloud = config.CLOUD
-     let hash_string = 'tags='+tags+'&timestamp=' + timestamp + api_secret;
-     let signature = CryptoJS.SHA1(hash_string).toString();
-     let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/image/upload'
-
-     let xhr = new XMLHttpRequest();
-     xhr.open('POST', upload_url);
-     xhr.onload = () => {
-     };
-     xhr.onreadystatechange = (e) => {
-       if (xhr.readyState !== 4) {
-         return;
-       }
-
-       if (xhr.status === 200) {
-         console.log('success', xhr.responseText);
-       } else {
-         console.warn('error',xhr.responseText,"--");
-       }
-     };
-     let formdata = new FormData();
-     formdata.append('file', {uri: uri, type: 'image/png', name: 'upload.png'});
-     formdata.append('timestamp', timestamp);
-     formdata.append('api_key', api_key);
-     formdata.append('signature', signature);
-     formdata.append('tags', tags);
-     xhr.send(formdata);
-   }
-
    uploadImage(uri,tags,location) {
 
-     let upload_url = 'http://127.0.0.1:3000/upload'
-
+     let upload_url = `${config.api}/upload`;
 
      let xhr = new XMLHttpRequest();
      xhr.open('POST', upload_url);
