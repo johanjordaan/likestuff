@@ -12,7 +12,6 @@ import {
 import Camera from 'react-native-camera';
 var RNFS = require('react-native-fs');
 var CryptoJS = require('crypto-js');
-var config = require('./config');
 
 const CAMERA = 'camera';
 const AFTER = 'after';
@@ -131,7 +130,7 @@ class LikeStuffApp extends Component {
 
 
 
-   uploadImage(uri,tags) {
+   uploadImagex(uri,tags) {
      let timestamp = (Date.now() / 1000 | 0).toString();
      let api_key = config.KEY
      let api_secret = config.SECRET
@@ -163,6 +162,33 @@ class LikeStuffApp extends Component {
      formdata.append('tags', tags);
      xhr.send(formdata);
    }
+
+   uploadImage(uri,tags) {
+
+     let upload_url = 'http://127.0.0.1:3000/upload'
+
+
+     let xhr = new XMLHttpRequest();
+     xhr.open('POST', upload_url);
+     xhr.onload = () => {
+     };
+     xhr.onreadystatechange = (e) => {
+       if (xhr.readyState !== 4) {
+         return;
+       }
+       if (xhr.status === 200) {
+         console.log('success', xhr.responseText);
+       } else {
+         console.warn('error',xhr.responseText,"--");
+       }
+     };
+     let formdata = new FormData();
+     formdata.append('file', {uri: uri, type: 'image/png', name: 'upload.png'});
+     formdata.append('tags', tags);
+
+     xhr.send(formdata);
+   }
+
 
    handlePicture(caption,location) {
       return this.refs.camera.capture().then((data)=>{
