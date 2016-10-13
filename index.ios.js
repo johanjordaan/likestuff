@@ -116,14 +116,14 @@ class LikeStuffApp extends Component {
 
    lovePicture() {
       var location = ""; //TODO : get location
-      this.handlePicture("love",location).then(()=>{
+      this.handlePicture("love",this.state.lastPosition).then(()=>{
          this.testFS();
       });
    }
 
    hatePicture() {
       var location = ""; //TODO : get location
-      this.handlePicture("hate",location).then(()=>{
+      this.handlePicture("hate",this.state.lastPosition).then(()=>{
          this.testFS();
       });
    }
@@ -163,7 +163,7 @@ class LikeStuffApp extends Component {
      xhr.send(formdata);
    }
 
-   uploadImage(uri,tags) {
+   uploadImage(uri,tags,location) {
 
      let upload_url = 'http://127.0.0.1:3000/upload'
 
@@ -185,6 +185,7 @@ class LikeStuffApp extends Component {
      let formdata = new FormData();
      formdata.append('file', {uri: uri, type: 'image/png', name: 'upload.png'});
      formdata.append('tags', tags);
+     formdata.append('location', location);
 
      xhr.send(formdata);
    }
@@ -194,7 +195,7 @@ class LikeStuffApp extends Component {
       return this.refs.camera.capture().then((data)=>{
          this.setState({currentScreen:AFTER,photo:data})
          console.log(data);
-         this.uploadImage(data.path,caption)
+         this.uploadImage(data.path,caption,location)
          // Send caption - with picture to server
          // Remove from your camera roll?
             // Send the picture to the server for processing
